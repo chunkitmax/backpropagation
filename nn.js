@@ -70,6 +70,7 @@ NN.prototype.test =
 function (patterns)
 {
     console.log();
+    console.log('Test results:')
     for (var p of patterns)
         console.log(math.squeeze(p[0]), '->', math.squeeze(this.update(p[0])));
 };
@@ -136,6 +137,12 @@ function (inputs)
     return this.ao;
 };
 
+/**
+ * do backpropagation
+ * @param {Array} targets array of desired output
+ * @param {number} N learning rate
+ * @param {number} M momentum factor
+ */
 NN.prototype.backPropagate = 
 function (targets, N, M)
 {
@@ -187,7 +194,7 @@ var pat = [ [[0,0], [1]],
             [[1,1], [1]] ];
 
 n = new NN(2, 2, 1);
-n.train(pat, 1000, 0.5, 0.1);
+n.train(pat, 10000, 0.5, 0.1);
 n.test(pat);
 n.weights();
 
