@@ -1,3 +1,5 @@
+// translate https://github.com/jgabriellima/backpropagation to js
+
 const math = require('mathjs');
 
 /**
