@@ -39,27 +39,32 @@ var dsigmoid = (y) => { return (1.0 - math.pow(y, 2)) };
 var NN =
 function (inputNum, hiddenNum, outputNum)
 {
+    // number of input, hidden, and output nodes
     this.ni = inputNum + 1;
     this.nh = hiddenNum;
     this.no = outputNum;
     
+    // activations for nodes
     this.ai = newMatrix(this.ni, 1, 1.0);
     this.ah = newMatrix(this.nh, 1, 1.0);
     this.ao = newMatrix(this.no, 1, 1.0);
 
+    // create weights
     this.wi = newMatrix(this.nh, this.ni);
     this.wo = newMatrix(this.no, this.nh);
 
+    // set them to random vaules
     this.wi = math.map(this.wi, (val) => { return rand(-0.2, 0.2); });
     this.wo = math.map(this.wo, (val) => { return rand(-2.0, 2.0); });
 
+    // last change in weights for momentum
     this.ci = newMatrix(this.nh, this.ni);
     this.co = newMatrix(this.no, this.nh);
 };
 
 /**
  * test cases
- * @param {Array} patterns array of patterns and results
+ * @param {Array} patterns array of input and output pair
  */
 NN.prototype.test = 
 function (patterns)
@@ -77,17 +82,19 @@ function ()
 {
     console.log();
     console.log('Input weights:');
-    for (var i = 0; i < this.ni; i++)
-        console.log(this.wi[i]);
+    console.log(this.wi);
     
     console.log();
 
-    for (var i = 0; i < this.nh; i++)
-        console.log(this.wo[i]);
+    console.log(this.wo);
 };
 
 /**
- * 
+ * train the network
+ * @param {Array} patterns array of input and output pair
+ * @param {number} iterations number of iterations
+ * @param {number} N learning rate
+ * @param {number} M momentum factor
  */
 NN.prototype.train = 
 function (patterns, iterations, N, M)
@@ -117,8 +124,13 @@ function (inputs)
     else if (!Array.isArray(inputs))
         throw new Error('input type not match');
     
+    // input activations
     this.ai.subset(math.index([1, this.ni - 1], 0), inputs);
+
+    // hidden activations
     this.ah = math.map(math.multiply(this.wi, this.ai), sigmoid);
+
+    // output activations
     this.ao = math.map(math.multiply(this.wo, this.ah), sigmoid);
 
     return this.ao;
@@ -130,27 +142,33 @@ function (targets, N, M)
     if (targets.length != this.no)
         throw new Error('output length not match');
 
+    // transfrom to matrix from array
     targets = math.matrix(targets);
     targets = math.resize(targets, [this.no, 1]);
 
+    // calculate error terms for output
     var outputError = math.subtract(targets, this.ao);
     var dAo = math.map(this.ao, dsigmoid);
     var outputDelta = math.dotMultiply(dAo, outputError);
 
+    // calculate error terms for hidden
     var hiddenError = math.multiply(math.transpose(this.wo), outputDelta);
     var dWo = math.map(this.ah, dsigmoid);
     var hiddenDelta = math.dotMultiply(dWo, hiddenError);
 
+    // update output weights
     var outputChange = math.multiply(outputDelta, math.transpose(this.ah));
     this.wo = math.add(this.wo, math.multiply(N, outputChange));
     this.wo = math.add(this.wo, math.multiply(M, this.co));
     this.co = outputChange;
 
+    // update input weights
     var hiddenChange = math.multiply(hiddenDelta, math.transpose(this.ai));
     this.wi = math.add(this.wi, math.multiply(N, hiddenChange));
     this.wi = math.add(this.wi, math.multiply(M, this.ci));
     this.ci = hiddenChange;
 
+    // calculate error
     errorVector = math.squeeze(outputError);
     var error = 0.0;
     if (typeof errorVector === 'number')
@@ -161,15 +179,18 @@ function (targets, N, M)
     return error;
 };
 
-var pat = [ [[0,0], [0]],
-            [[0,1], [1]],
-            [[1,0], [1]],
-            [[1,1], [0]] ];
+/****************************** */
+
+var pat = [ [[0,0], [1]],
+            [[0,1], [0]],
+            [[1,0], [0]],
+            [[1,1], [1]] ];
 
 n = new NN(2, 2, 1);
 n.train(pat, 1000, 0.5, 0.1);
 n.test(pat);
-// n.weights();
-// console.log(n);
+n.weights();
+
+/***************************** */
 
 console.log('\nEnd');
