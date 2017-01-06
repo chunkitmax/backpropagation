@@ -28,7 +28,7 @@ var sigmoid = (x) => math.tanh(x);
  * derivative of sigmoid function
  * @param {number} y value
  */
-var dsigmoid = (y) => { return (1.0 - math.pow(y, 2)) };
+var dsigmoid = (y) => (1.0 - math.pow(y, 2));
 
 /**
  * Neural Network class
@@ -72,7 +72,7 @@ function (patterns)
     console.log();
     console.log('Test results:')
     for (var p of patterns)
-        console.log(math.squeeze(p[0]), '->', math.squeeze(this.update(p[0])));
+        console.log(math.squeeze(p[0]) + "->" + math.squeeze(this.update(p[0])));
 };
 
 /**
@@ -83,11 +83,11 @@ function ()
 {
     console.log();
     console.log('Input weights:');
-    console.log(this.wi);
+    console.log("\twi:\n", this.wi._data);
     
     console.log();
 
-    console.log(this.wo);
+    console.log("\two:\n", this.wo._data);
 };
 
 /**
@@ -108,7 +108,7 @@ function (patterns, iterations, N, M)
             this.update(p[0]);
             error += this.backPropagate(p[1], N, M);
         }
-        if (i % parseInt(iterations / 10) == 0)
+        if (i % 1000 == 0)
             console.log('error ', error);
     }
 };
