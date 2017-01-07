@@ -23,13 +23,13 @@ var newMatrix = (i, j, fill) =>
  * sigmoid function
  * @param {number} x value
  */
-var sigmoid = (x) => ((x > 0.0)? x : 0.01*x);//math.tanh(x);
+var sigmoid = (x) => (1 / (1 + math.exp(-x)));//math.tanh(x);
 // var sigmoid = (x) => math.tanh(x);
 /**
  * derivative of sigmoid function
  * @param {number} y value
  */
-var dsigmoid = (y) => ((y > 0.0)? 1 : 0.01);//(1.0 - math.pow(y, 2));
+var dsigmoid = (y) => (sigmoid(y) * (1 - sigmoid(y)));//(1.0 - math.pow(y, 2));
 // var dsigmoid = (y) => (1.0 - math.pow(y, 2));
 
 /**
@@ -196,9 +196,9 @@ function (targets, N, M)
 /****************************** */
 
 var pat = [ [[0,0], [1]],
-            [[0,1], [0]],
-            [[1,0], [1]],
-            [[1,1], [1]] ];
+            [[0,1], [1]],
+            [[1,0], [0]],
+            [[1,1], [0]] ];
 
 n = new NN(2, 2, 1);
 n.train(pat, 50000, 0.001, 0.005);
